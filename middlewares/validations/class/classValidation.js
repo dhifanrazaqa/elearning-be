@@ -4,7 +4,6 @@ const ClientError = require("../../../errors/clientError");
 const schema = Joi.object({
   name: Joi.string().required(),
   description: Joi.string().required(),
-  teacherId: Joi.string().required(),
 });
 
 const validate = (req, res, next) => {

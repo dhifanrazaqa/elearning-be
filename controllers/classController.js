@@ -3,13 +3,14 @@ const NotFoundError = require("../errors/notFoundError");
 const prisma = require("../prismaClient");
 
 const createClass = async (req, res, next) => {
-  const { name, description, teacherId } = req.body;
+  const { name, description } = req.body;
+  const { id } = req.user;
   try {
     const newClass = await prisma.class.create({
       data: {
         name,
         description,
-        teacherId,
+        teacherId: id,
       },
     });
     return res
