@@ -15,7 +15,7 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: "https://lentera-fe.vercel.app",
+    origin: ["https://lentera-fe.vercel.app", "http://localhost:5173"],
     credentials: true,
     allowedHeaders: [
       "Origin",
