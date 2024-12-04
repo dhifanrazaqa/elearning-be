@@ -35,7 +35,7 @@ const getClassById = async (req, res, next) => {
   try {
     const classData = await prisma.class.findUnique({
       where: { id: classId },
-      include: { students: true },
+      include: { students: true, teach: true },
     });
 
     if (!classData) throw new NotFoundError("Class not found");
