@@ -2,9 +2,12 @@ const Joi = require("joi");
 const ClientError = require("../../../errors/clientError");
 
 const schema = Joi.object({
-  name: Joi.string().required(),
-  description: Joi.string().required(),
-  imageUrl: Joi.string().required()
+  contentId: Joi.string().required(),
+  title: Joi.string().required(),
+  description: Joi.string(),
+  fileUrl: Joi.string(),
+  startDate: Joi.date().required(),
+  deadline: Joi.date().required(),
 });
 
 const validate = (req, res, next) => {

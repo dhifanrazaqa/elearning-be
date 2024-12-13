@@ -14,14 +14,19 @@ datasource db {
 }
 
 model User {
-  id         String        @id @default(uuid())
-  name       String
-  email      String        @unique
-  password   String
-  role       String // "siswa" or "guru"
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
+  role     String // "siswa" or "guru"
+
   classes    ClassOnUser[]
   Submission Submission[]
   teaches    Class[]
+  Attempt    Attempt[]
+  ForumPost  ForumPost[]
+  ForumReply ForumReply[]
+  Quiz       Quiz[]
 }
 
 model Class {
@@ -29,16 +34,18 @@ model Class {
   name        String
   description String?
   teacherId   String
+  imageUrl    String
   teach       User          @relation(fields: [teacherId], references: [id])
   students    ClassOnUser[]
   contents    Content[]
-  assignments Assignment[]
+  ForumPost   ForumPost[]
 }
 
 model ClassOnUser {
   id      String @id @default(uuid())
   userId  String
   classId String
+  status  String // "acc" or "wait"
 
   user  User  @relation(fields: [userId], references: [id])
   class Class @relation(fields: [classId], references: [id])
@@ -51,23 +58,119 @@ model Content {
   title   String
   body    String
   classId String
-  class   Class  @relation(fields: [classId], references: [id])
+
+  assignments Assignment[]
+  materials   Material[]
+  Quiz        Quiz[]
+  class       Class        @relation(fields: [classId], references: [id])
 }
 
 model Assignment {
-  id          String       @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  classId     String
-  class       Class        @relation(fields: [classId], references: [id])
+  description String?
+  fileUrl     String?
+  contentId   String
+  startDate   DateTime
+  deadline    DateTime
+
+  content     Content      @relation(fields: [contentId], references: [id])
   submissions Submission[]
 }
 
 model Submission {
-  id           String @id @default(uuid())
+  id           String   @id @default(uuid())
   studentId    String
   assignmentId String
-  grade        Int?
+  text         String?
+  fileUrl      String?
+  grade        Float?
+  submittedAt  DateTime @default(now())
+  status       String // on-time atau late
 
   student    User       @relation(fields: [studentId], references: [id])
   assignment Assignment @relation(fields: [assignmentId], references: [id])
+}
+
+model Material {
+  id        String  @id @default(uuid())
+  text      String
+  contentId String
+  content   Content @relation(fields: [contentId], references: [id])
+}
+
+model ForumPost {
+  id          String       @id @default(uuid())
+  text       String
+  createdAt   DateTime     @default(now())
+  classId     String
+  userId      String
+  user        User         @relation(fields: [userId], references: [id])
+  class       Class        @relation(fields: [classId], references: [id])
+  ForumReply  ForumReply[]
+}
+
+model ForumReply {
+  id        String    @id @default(uuid())
+  text      String
+  createdAt DateTime  @default(now())
+  forumId   String
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  forumPost ForumPost @relation(fields: [forumId], references: [id])
+}
+
+model Quiz {
+  id          String @id @default(uuid())
+  title       String
+  description String
+  contentId   String
+  teacherId   String
+  duration    Int
+
+  teacher  User       @relation(fields: [teacherId], references: [id])
+  content  Content    @relation(fields: [contentId], references: [id])
+  Question Question[]
+  Attempt  Attempt[]
+}
+
+model Question {
+  id     String @id @default(uuid())
+  text   String
+  quizId String
+
+  quiz   Quiz     @relation(fields: [quizId], references: [id])
+  Answer Answer[]
+}
+
+model Answer {
+  id         String  @id @default(uuid())
+  text       String
+  isCorrect  Boolean
+  questionId String
+
+  question      Question        @relation(fields: [questionId], references: [id])
+  AttemptAnswer AttemptAnswer[]
+}
+
+model Attempt {
+  id        String   @id @default(uuid())
+  userId    String
+  quizId    String
+  classId   String
+  score     Float?
+  createdAt DateTime @default(now())
+
+  answers AttemptAnswer[]
+  user    User            @relation(fields: [userId], references: [id])
+  quiz    Quiz            @relation(fields: [quizId], references: [id])
+}
+
+model AttemptAnswer {
+  id        String  @id @default(uuid())
+  attemptId String
+  answerId  String
+
+  attempt Attempt @relation(fields: [attemptId], references: [id])
+  answer  Answer  @relation(fields: [answerId], references: [id])
 }

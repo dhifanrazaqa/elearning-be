@@ -7,6 +7,9 @@ const authRoutes = require("./routes/authRoutes");
 const classRoutes = require("./routes/classRoutes");
 const contentRoutes = require("./routes/contentRoutes");
 const assignmentRoutes = require("./routes/assignmentRoutes");
+const materialRoutes = require("./routes/materialRoute");
+const forumRoutes = require("./routes/forumRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 const NotFoundMiddleware = require("./middlewares/notFoundMiddleware");
 const ErrorHandlerMiddleware = require("./middlewares/errorHandlerMiddleware");
 
@@ -35,6 +38,9 @@ app.use("/auth", authRoutes);
 app.use("/classes", classRoutes);
 app.use("/contents", contentRoutes);
 app.use("/assignments", assignmentRoutes);
+app.use("/materials", materialRoutes);
+app.use("/forums", forumRoutes);
+app.use("/quizzes", quizRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -5,7 +5,9 @@ const {
   getClassById,
   getClassByUserId,
   addStudent,
+  changeStudentStatus,
   removeStudentFromClass,
+  getAllStudentInClass,
 } = require("../controllers/classController");
 const authenticateToken = require("../middlewares/authMiddleware");
 const checkRole = require("../middlewares/roleMiddleware");
@@ -40,6 +42,15 @@ router.post(
   addStudent
 );
 
+// Guru mengubah status siswa
+router.post(
+  "/status-student",
+  authenticateToken,
+  checkRole("guru"),
+  addStudentValidation,
+  changeStudentStatus
+);
+
 // Guru menghapus siswa dari kelas
 router.delete(
   "/remove-student",
@@ -48,5 +59,7 @@ router.delete(
   addStudentValidation,
   removeStudentFromClass
 );
+
+router.get("/students/:id", authenticateToken, getAllStudentInClass);
 
 module.exports = router;
