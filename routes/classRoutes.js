@@ -8,6 +8,8 @@ const {
   changeStudentStatus,
   removeStudentFromClass,
   getAllStudentInClass,
+  getStats,
+  getClassStatus,
 } = require("../controllers/classController");
 const authenticateToken = require("../middlewares/authMiddleware");
 const checkRole = require("../middlewares/roleMiddleware");
@@ -27,6 +29,9 @@ router.post(
 
 // Melihat semua kelas
 router.get("/", getAllClass);
+
+// Melihat semua kelas
+router.get("/stats", authenticateToken, getStats);
 
 // Melihat kelas berdasarkan id student
 router.get("/my-class", authenticateToken, getClassByUserId);
@@ -59,6 +64,9 @@ router.delete(
   addStudentValidation,
   removeStudentFromClass
 );
+
+// Melihat status kelas
+router.get("/:classId/status", authenticateToken, getClassStatus);
 
 router.get("/students/:id", authenticateToken, getAllStudentInClass);
 

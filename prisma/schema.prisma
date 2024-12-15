@@ -100,14 +100,14 @@ model Material {
 }
 
 model ForumPost {
-  id          String       @id @default(uuid())
+  id         String       @id @default(uuid())
   text       String
-  createdAt   DateTime     @default(now())
-  classId     String
-  userId      String
-  user        User         @relation(fields: [userId], references: [id])
-  class       Class        @relation(fields: [classId], references: [id])
-  ForumReply  ForumReply[]
+  createdAt  DateTime     @default(now())
+  classId    String
+  userId     String
+  user       User         @relation(fields: [userId], references: [id])
+  class      Class        @relation(fields: [classId], references: [id])
+  ForumReply ForumReply[]
 }
 
 model ForumReply {
@@ -139,8 +139,9 @@ model Question {
   text   String
   quizId String
 
-  quiz   Quiz     @relation(fields: [quizId], references: [id])
-  Answer Answer[]
+  quiz          Quiz            @relation(fields: [quizId], references: [id])
+  Answer        Answer[]
+  AttemptAnswer AttemptAnswer[]
 }
 
 model Answer {
@@ -167,10 +168,12 @@ model Attempt {
 }
 
 model AttemptAnswer {
-  id        String  @id @default(uuid())
-  attemptId String
-  answerId  String
+  id         String @id @default(uuid())
+  attemptId  String
+  questionId String
+  answerId   String
 
-  attempt Attempt @relation(fields: [attemptId], references: [id])
-  answer  Answer  @relation(fields: [answerId], references: [id])
+  attempt  Attempt  @relation(fields: [attemptId], references: [id])
+  answer   Answer   @relation(fields: [answerId], references: [id])
+  question Question @relation(fields: [questionId], references: [id])
 }

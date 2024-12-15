@@ -60,9 +60,10 @@ const getClassByUserId = async (req, res, next) => {
   try {
     let classesData = [];
     let allClassesData = [];
+    let waitClass = [];
     if (req.user.role === "siswa") {
       classesData = await prisma.classOnUser.findMany({
-        where: { userId: req.user.id },
+        where: { userId: req.user.id, status: "acc" },
         select: {
           class: true,
         },
@@ -78,6 +79,16 @@ const getClassByUserId = async (req, res, next) => {
 
       classesData = classesData.flatMap((item) => item.class);
       if (!classesData) throw new NotFoundError("Class not found");
+
+      waitClass = await prisma.classOnUser.findMany({
+        where: { userId: req.user.id, status: "wait" },
+        select: {
+          class: true,
+        },
+      });
+
+      waitClass = waitClass.flatMap((item) => item.class);
+      if (!waitClass) throw new NotFoundError("Class not found");
     } else {
       classesData = await prisma.class.findMany({
         where: { teacherId: req.user.id },
@@ -96,7 +107,7 @@ const getClassByUserId = async (req, res, next) => {
 
     res.status(200).json({
       message: "Class retrieved successfully",
-      data: { userData: classesData, allData: allClassesData },
+      data: { userData: classesData, allData: allClassesData, waitClass },
     });
   } catch (err) {
     return next(err);
@@ -196,6 +207,29 @@ const removeStudentFromClass = async (req, res, next) => {
   }
 };
 
+const getClassStatus = async (req, res, next) => {
+  const { classId } = req.params;
+  try {
+    let classData = await prisma.classOnUser.findUnique({
+      where: {
+        userId_classId: {
+          userId: req.user.id,
+          classId: classId,
+        },
+      },
+    });
+
+    if (!classData) classData = {};
+
+    return res.json({
+      message: "Retrieved class students data successfully",
+      data: classData,
+    });
+  } catch (error) {
+    return next("Error retrieving students data");
+  }
+};
+
 const getAllStudentInClass = async (req, res, next) => {
   const { id } = req.params;
   try {
@@ -218,6 +252,45 @@ const getAllStudentInClass = async (req, res, next) => {
   }
 };
 
+const getStats = async (req, res, next) => {
+  try {
+    const jumlahMurid = await prisma.user.count({
+      where: { role: "siswa" },
+    });
+    const jumlahKelas = await prisma.class.count({
+      where: { teacherId: req.user.id },
+    });
+    const jumlahForumPost = await prisma.forumPost.count({
+      where: { userId: req.user.id },
+    });
+    const jumlahForumReply = await prisma.forumReply.count({
+      where: { userId: req.user.id },
+    });
+    const jumlahSubmission = await prisma.submission.count({
+      where: {
+        assignment: {
+          content: {
+            class: {
+              teacherId: req.user.id,
+            },
+          },
+        },
+      },
+    });
+    return res.json({
+      message: "Retrieved stats data successfully",
+      data: {
+        jumlahMurid,
+        jumlahKelas,
+        jumlahForum: jumlahForumPost + jumlahForumReply,
+        jumlahSubmission,
+      },
+    });
+  } catch (error) {
+    return next("Error retrieving students data");
+  }
+};
+
 module.exports = {
   createClass,
   getAllClass,
@@ -227,4 +300,6 @@ module.exports = {
   changeStudentStatus,
   removeStudentFromClass,
   getAllStudentInClass,
+  getStats,
+  getClassStatus,
 };

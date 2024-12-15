@@ -3,8 +3,6 @@ const ClientError = require("../../../errors/clientError");
 
 const schema = Joi.object({
   attemptId: Joi.string().required(),
-  answerId: Joi.string().required(),
-  questionId: Joi.string().required(),
 });
 
 const validate = (req, res, next) => {

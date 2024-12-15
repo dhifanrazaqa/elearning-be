@@ -8,6 +8,8 @@ const {
   createAttempt,
   answerQuestion,
   getFinalScore,
+  createQuizWithQuestions,
+  getAnswers,
 } = require("../controllers/quizController");
 const authenticateToken = require("../middlewares/authMiddleware");
 const checkRole = require("../middlewares/roleMiddleware");
@@ -16,6 +18,7 @@ const answerValidation = require("../middlewares/validations/quiz/answerValidati
 const questionValidation = require("../middlewares/validations/quiz/questionValidation");
 const attemptValidation = require("../middlewares/validations/quiz/attemptValidation");
 const answeringValidation = require("../middlewares/validations/quiz/answeringValidation");
+const finalAnswerValidation = require("../middlewares/validations/quiz/finalAnswerValidation");
 
 const router = express.Router();
 
@@ -25,7 +28,7 @@ router.post(
   authenticateToken,
   checkRole("guru"),
   quizValidation,
-  createQuiz
+  createQuizWithQuestions
 );
 
 // Guru bisa mendapatkan quiz berdasarkan content
@@ -56,7 +59,7 @@ router.post(
 router.post(
   "/quiz/attempt",
   authenticateToken,
-  checkRole("guru"),
+  checkRole("siswa"),
   attemptValidation,
   createAttempt
 );
@@ -65,16 +68,25 @@ router.post(
 router.post(
   "/quiz/attempt/answer",
   authenticateToken,
-  checkRole("guru"),
+  checkRole("siswa"),
   answeringValidation,
   answerQuestion
 );
 
-// Siswa bisa menambahkan jawabannya
-router.post(
-  "/quiz/attempt/submit/:attemptId",
+// Siswa bisa mendapatkan jawabannya
+router.get(
+  "/quiz/attempt/:quizId",
   authenticateToken,
-  checkRole("guru"),
+  checkRole("siswa"),
+  getAnswers
+);
+
+// Siswa bisa mendapatkan nilai
+router.post(
+  "/quiz/attempt/submit/",
+  authenticateToken,
+  checkRole("siswa"),
+  finalAnswerValidation,
   getFinalScore
 );
 
