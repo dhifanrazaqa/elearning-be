@@ -7,6 +7,7 @@ const {
   getAllAssignment,
   getAssignmentById,
   getSubmissionById,
+  checkSubmission,
 } = require("../controllers/assignmentController");
 const authenticateToken = require("../middlewares/authMiddleware");
 const checkRole = require("../middlewares/roleMiddleware");
@@ -33,19 +34,21 @@ router.get(
   getAllSubmissionByAssignment
 );
 
-router.get(
-  "/:id",
-  authenticateToken,
-  checkRole("siswa"),
-  getAssignmentById
-)
+router.get("/:id", authenticateToken, checkRole("siswa"), getAssignmentById);
 
 router.get(
   "/submission/:id",
   authenticateToken,
   checkRole("siswa"),
   getSubmissionById
-)
+);
+
+router.get(
+  "/submission/check/:assignmentId",
+  authenticateToken,
+  checkRole("siswa"),
+  checkSubmission
+);
 
 //Mengambil Id Content
 router.get(
@@ -53,7 +56,7 @@ router.get(
   authenticateToken,
   checkRole("siswa"),
   getAllAssignment
-)
+);
 
 // Siswa bisa mengumpulkan tugas
 router.post(

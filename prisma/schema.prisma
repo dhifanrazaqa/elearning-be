@@ -35,7 +35,7 @@ model Class {
   description String?
   teacherId   String
   imageUrl    String
-  teach       User          @relation(fields: [teacherId], references: [id])
+  teach       User          @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   students    ClassOnUser[]
   contents    Content[]
   ForumPost   ForumPost[]
@@ -47,8 +47,8 @@ model ClassOnUser {
   classId String
   status  String // "acc" or "wait"
 
-  user  User  @relation(fields: [userId], references: [id])
-  class Class @relation(fields: [classId], references: [id])
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@unique([userId, classId]) // Unique pair to avoid duplicates
 }
@@ -62,7 +62,7 @@ model Content {
   assignments Assignment[]
   materials   Material[]
   Quiz        Quiz[]
-  class       Class        @relation(fields: [classId], references: [id])
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
 }
 
 model Assignment {
@@ -74,7 +74,7 @@ model Assignment {
   startDate   DateTime
   deadline    DateTime
 
-  content     Content      @relation(fields: [contentId], references: [id])
+  content     Content      @relation(fields: [contentId], references: [id], onDelete: Cascade)
   submissions Submission[]
 }
 
@@ -88,15 +88,15 @@ model Submission {
   submittedAt  DateTime @default(now())
   status       String // on-time atau late
 
-  student    User       @relation(fields: [studentId], references: [id])
-  assignment Assignment @relation(fields: [assignmentId], references: [id])
+  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
 }
 
 model Material {
   id        String  @id @default(uuid())
   text      String
   contentId String
-  content   Content @relation(fields: [contentId], references: [id])
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
 }
 
 model ForumPost {
@@ -105,8 +105,8 @@ model ForumPost {
   createdAt  DateTime     @default(now())
   classId    String
   userId     String
-  user       User         @relation(fields: [userId], references: [id])
-  class      Class        @relation(fields: [classId], references: [id])
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class      Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
   ForumReply ForumReply[]
 }
 
@@ -116,8 +116,8 @@ model ForumReply {
   createdAt DateTime  @default(now())
   forumId   String
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  forumPost ForumPost @relation(fields: [forumId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  forumPost ForumPost @relation(fields: [forumId], references: [id], onDelete: Cascade)
 }
 
 model Quiz {
@@ -128,8 +128,8 @@ model Quiz {
   teacherId   String
   duration    Int
 
-  teacher  User       @relation(fields: [teacherId], references: [id])
-  content  Content    @relation(fields: [contentId], references: [id])
+  teacher  User       @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  content  Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
   Question Question[]
   Attempt  Attempt[]
 }
@@ -139,7 +139,7 @@ model Question {
   text   String
   quizId String
 
-  quiz          Quiz            @relation(fields: [quizId], references: [id])
+  quiz          Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
   Answer        Answer[]
   AttemptAnswer AttemptAnswer[]
 }
@@ -150,7 +150,7 @@ model Answer {
   isCorrect  Boolean
   questionId String
 
-  question      Question        @relation(fields: [questionId], references: [id])
+  question      Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
   AttemptAnswer AttemptAnswer[]
 }
 
@@ -163,8 +163,8 @@ model Attempt {
   createdAt DateTime @default(now())
 
   answers AttemptAnswer[]
-  user    User            @relation(fields: [userId], references: [id])
-  quiz    Quiz            @relation(fields: [quizId], references: [id])
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz    Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
 model AttemptAnswer {
@@ -173,7 +173,7 @@ model AttemptAnswer {
   questionId String
   answerId   String
 
-  attempt  Attempt  @relation(fields: [attemptId], references: [id])
-  answer   Answer   @relation(fields: [answerId], references: [id])
-  question Question @relation(fields: [questionId], references: [id])
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  answer   Answer   @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 }

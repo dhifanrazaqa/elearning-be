@@ -25,6 +25,28 @@ const createMaterial = async (req, res, next) => {
   }
 };
 
+const getMaterialById = async (req, res, next) => {
+  const { materialId } = req.params;
+
+  try {
+    const materialData = await prisma.material.findUnique({
+      where: { id: materialId },
+      include: {
+        content: true,
+      },
+    });
+
+    if (!materialData) throw new ClientError("Invalid material");
+
+    return res
+      .status(200)
+      .json({ message: "Material retrieved successfully", data: materialData });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 module.exports = {
   createMaterial,
+  getMaterialById,
 };

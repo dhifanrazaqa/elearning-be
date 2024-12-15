@@ -128,17 +128,17 @@ const getAllAssignment = async (req, res, next) => {
     const assignmentData = await prisma.Assignment.findMany({
       where: {
         contentId,
-      } 
-    })
+      },
+    });
     if (!assignmentData) throw new ClientError("Invalid Assignment");
     return res.json({
       message: "Retrieved Assignment data successfully",
       data: assignmentData,
     });
-  } catch(err){
+  } catch (err) {
     return next("Error retrieving Assignment data");
   }
-}
+};
 
 const getAssignmentById = async (req, res, next) => {
   const { id } = req.params;
@@ -146,36 +146,54 @@ const getAssignmentById = async (req, res, next) => {
     const assignmentData = await prisma.Assignment.findUnique({
       where: {
         id,
-      } 
-    })
+      },
+    });
     if (!assignmentData) throw new ClientError("Invalid Assignment");
     return res.json({
       message: "Retrieved Assignment data successfully",
       data: assignmentData,
     });
-  } catch(err){
+  } catch (err) {
     return next("Error retrieving Assignment data");
   }
-}
+};
 
-const getSubmissionById = async ( req, res, next) => {
+const getSubmissionById = async (req, res, next) => {
   const { id } = req.params;
   try {
     const assignmentData = await prisma.Submission.findUnique({
       where: {
         id,
-      } 
-    })
+      },
+    });
     if (!assignmentData) throw new ClientError("Invalid Assignment");
     return res.json({
       message: "Retrieved Assignment data successfully",
       data: assignmentData,
     });
-  } catch(err){
+  } catch (err) {
     return next("Error retrieving Assignment data");
   }
-}
+};
 
+const checkSubmission = async (req, res, next) => {
+  const { assignmentId } = req.params;
+  try {
+    const submissionData = await prisma.submission.findFirst({
+      where: {
+        assignmentId,
+        studentId: req.user.id,
+      },
+    });
+    if (!submissionData) throw new ClientError("Invalid submission");
+    return res.json({
+      message: "Retrieved submission data successfully",
+      data: submissionData,
+    });
+  } catch (err) {
+    return next("Error retrieving submission data");
+  }
+};
 
 module.exports = {
   getSubmissionById,
@@ -185,4 +203,5 @@ module.exports = {
   getAllSubmissionByAssignment,
   submitAssignment,
   gradeAssignment,
+  checkSubmission,
 };
