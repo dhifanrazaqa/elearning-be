@@ -326,6 +326,70 @@ const getFinalScore = async (req, res, next) => {
   }
 };
 
+const getClassAttemptsSummary = async (req, res, next) => {
+  const { classId } = req.params;
+
+  try {
+    const classData = await prisma.class.findUnique({
+      where: { id: classId },
+      include: {
+        attempts: {
+          include: {
+            quiz: {
+              include: {
+                Question: {
+                  include: {
+                    Answer: true,
+                  },
+                },
+              },
+            },
+            answers: {
+              include: {
+                answer: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!classData) throw new ClientError("Invalid class");
+
+    const attemptsSummary = classData.attempts.map((attempt) => {
+      const questionCount = attempt.quiz.Question.length;
+      let correctAnswerCount = 0;
+
+      attempt.quiz.Question.forEach((question) => {
+        const yourAnswer = attempt.answers.find(
+          (ans) => ans.questionId === question.id
+        );
+        const isCorrect = yourAnswer ? yourAnswer.answer.isCorrect : false;
+
+        if (isCorrect) correctAnswerCount += 1;
+      });
+
+      const score = (correctAnswerCount / questionCount) * 100;
+
+      return {
+        title: attempt.quiz.title,
+        correctCount: correctAnswerCount,
+        totalQuestions: questionCount,
+        score,
+      };
+    });
+
+    return res.status(200).json({
+      message: "Class attempts summary retrieved successfully",
+      data: attemptsSummary,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { getClassAttemptsSummary };
+
 module.exports = {
   createQuiz,
   createQuizWithQuestions,
@@ -337,4 +401,5 @@ module.exports = {
   answerQuestion,
   getAnswers,
   getFinalScore,
+  getClassAttemptsSummary,
 };
