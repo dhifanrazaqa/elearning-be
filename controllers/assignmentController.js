@@ -75,7 +75,7 @@ const getAllSubmissionByAssignment = async (req, res, next) => {
 };
 
 const submitAssignment = async (req, res, next) => {
-  const { assignmentId, text = null, fileUrl = null } = req.body;
+  const { assignmentId, text, fileUrl } = req.body;
   const { id } = req.user;
 
   try {
@@ -108,7 +108,6 @@ const submitAssignment = async (req, res, next) => {
 
 const gradeAssignment = async (req, res, next) => {
   const { submissionId, grade } = req.body;
-
   try {
     const updatedSubmission = await prisma.submission.update({
       where: { id: submissionId },
@@ -123,7 +122,65 @@ const gradeAssignment = async (req, res, next) => {
   }
 };
 
+const getAllAssignment = async (req, res, next) => {
+  const { contentId } = req.params;
+  try {
+    const assignmentData = await prisma.Assignment.findMany({
+      where: {
+        contentId,
+      } 
+    })
+    if (!assignmentData) throw new ClientError("Invalid Assignment");
+    return res.json({
+      message: "Retrieved Assignment data successfully",
+      data: assignmentData,
+    });
+  } catch(err){
+    return next("Error retrieving Assignment data");
+  }
+}
+
+const getAssignmentById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const assignmentData = await prisma.Assignment.findUnique({
+      where: {
+        id,
+      } 
+    })
+    if (!assignmentData) throw new ClientError("Invalid Assignment");
+    return res.json({
+      message: "Retrieved Assignment data successfully",
+      data: assignmentData,
+    });
+  } catch(err){
+    return next("Error retrieving Assignment data");
+  }
+}
+
+const getSubmissionById = async ( req, res, next) => {
+  const { id } = req.params;
+  try {
+    const assignmentData = await prisma.Submission.findUnique({
+      where: {
+        id,
+      } 
+    })
+    if (!assignmentData) throw new ClientError("Invalid Assignment");
+    return res.json({
+      message: "Retrieved Assignment data successfully",
+      data: assignmentData,
+    });
+  } catch(err){
+    return next("Error retrieving Assignment data");
+  }
+}
+
+
 module.exports = {
+  getSubmissionById,
+  getAllAssignment,
+  getAssignmentById,
   createAssignment,
   getAllSubmissionByAssignment,
   submitAssignment,
